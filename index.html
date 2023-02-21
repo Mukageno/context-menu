@@ -1,0 +1,144 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>contextMenu</title>
+</head>
+
+<style>
+    body {
+        background: #000;
+    }
+
+    * {
+        padding: 0;
+        margin: 0;
+        box-sizing: border-box;
+        font-family: Arial;
+    }
+
+    .context-menu {
+        background: #000;
+        width: max-content;
+        display: none;
+        position: fixed;
+        padding: 10px;
+        border: 1px solid #ffffff;
+    }
+
+    .context-menu li {
+        padding: 10px 40px;
+        cursor: pointer;
+        text-transform: uppercase;
+        list-style: none;
+        user-select: none;
+        border-bottom: 1px solid #1a1919;
+        color: #fff;
+    }
+
+    .context-menu li:last-child {
+        border: none;
+    }
+
+    .context-menu li:hover {
+        background: #444444;
+    }
+</style>
+
+<body>
+    <ul class="context-menu"></ul>
+
+
+    <script>
+
+        class ContextMenu {
+            constructor(list) {
+                this.title = list.title
+                this.event = list.event
+                const menu = document.querySelector('.context-menu')
+                this.getItems(menu, list)
+                this.contextClick(menu)
+                const items = document.querySelectorAll('.context-items')
+                this.events(list, items)
+
+            }
+            getItems(menu, list) {
+                for (const i in list) {
+                    menu.insertAdjacentHTML('beforeend',
+                        `
+                          <li class="context-items">${list[i].title}</li>
+                        `);
+                }
+
+            }
+            contextClick(menu) {
+                window.addEventListener('contextmenu', function (e) {
+                    e.preventDefault();
+                    menu.style.display = 'block'
+                    menu.style.left = e.pageX + 'px'
+                    menu.style.top = e.pageY + 'px'
+                    if (e.pageY + menu.offsetHeight > window.innerHeight && e.pageX + menu.offsetWidth > window.innerWidth) {
+                        menu.style.top = (e.pageY - menu.offsetHeight) + 'px'
+                        menu.style.left = (e.pageX - menu.offsetWidth) + 'px'
+                    } else if (e.pageY + menu.offsetHeight > window.innerHeight) {
+                        menu.style.top = (e.pageY - menu.offsetHeight) + 'px'
+                    } else if (e.pageX + menu.offsetWidth > window.innerWidth) {
+                        menu.style.left = (e.pageX - menu.offsetWidth) + 'px'
+                    }
+                })
+                menu.addEventListener('click', function (e) {
+                    e.stopPropagation()
+                })
+                menu.addEventListener('contextmenu', function (e) {
+                    e.preventDefault();
+                    e.stopPropagation()
+                })
+                document.addEventListener('click', function () {
+                    menu.style.display = 'none'
+                })
+            }
+            events(list, items) {
+                for (const i in list) {
+                    items[i].addEventListener('click',()=>{
+                            list[i].event()
+                    })
+                }
+
+            }
+        }
+
+
+        let list = [
+            {
+                title: 'refresh',
+                event: function () {
+                    location.reload()
+                }
+            },
+            {
+                title: 'second',
+                event: function () {  }
+            },
+            {
+                title: 'third',
+                event: function () { return null }
+            },
+            {
+                title: 'four',
+                event: function () { return null }
+            },
+            {
+                title: 'five',
+                event: function () { return null }
+            },
+        ]
+
+
+        new ContextMenu(list)
+    </script>
+</body>
+
+</html>
